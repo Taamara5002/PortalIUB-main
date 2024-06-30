@@ -4,6 +4,7 @@ import json
 import requests
 from google.oauth2 import service_account
 import google.auth.transport.requests
+from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
@@ -72,11 +73,11 @@ if SERVICE_ACCOUNT_FILE:
 
 # Configuración de la base de datos MySQL
 DB_CONFIG = {
-    'host': 'b8lqdzku58oxhs6djreg-mysql.services.clever-cloud.com',
-    'database': 'b8lqdzku58oxhs6djreg',
-    'user': 'uvi62ytz8qlrylss',
-    'password': 'rqmGLuUrPVIKPixW3UsC',
-    'port': 3306
+    'host': os.getenv('DB_HOST'),
+    'database': os.getenv('DB_DATABASE'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'port': int(os.getenv('DB_PORT'))
 }
 
 try:

@@ -1,6 +1,6 @@
 import logging
 from os import PathLike
-from typing import BinaryIO, List, Optional, Set, Union
+from typing import Any, BinaryIO, List, Optional, Set
 
 from .cd import (
     coherence_ratio,
@@ -31,7 +31,7 @@ explain_handler.setFormatter(
 
 
 def from_bytes(
-    sequences: Union[bytes, bytearray],
+    sequences: bytes,
     steps: int = 5,
     chunk_size: int = 512,
     threshold: float = 0.2,
@@ -40,7 +40,6 @@ def from_bytes(
     preemptive_behaviour: bool = True,
     explain: bool = False,
     language_threshold: float = 0.1,
-    enable_fallback: bool = True,
 ) -> CharsetMatches:
     """
     Given a raw bytes sequence, return the best possibles charset usable to render str objects.
@@ -362,8 +361,7 @@ def from_bytes(
             )
             # Preparing those fallbacks in case we got nothing.
             if (
-                enable_fallback
-                and encoding_iana in ["ascii", "utf_8", specified_encoding]
+                encoding_iana in ["ascii", "utf_8", specified_encoding]
                 and not lazy_str_hard_failure
             ):
                 fallback_entry = CharsetMatch(
@@ -509,7 +507,6 @@ def from_fp(
     preemptive_behaviour: bool = True,
     explain: bool = False,
     language_threshold: float = 0.1,
-    enable_fallback: bool = True,
 ) -> CharsetMatches:
     """
     Same thing than the function from_bytes but using a file pointer that is already ready.
@@ -525,12 +522,11 @@ def from_fp(
         preemptive_behaviour,
         explain,
         language_threshold,
-        enable_fallback,
     )
 
 
 def from_path(
-    path: Union[str, bytes, PathLike],  # type: ignore[type-arg]
+    path: "PathLike[Any]",
     steps: int = 5,
     chunk_size: int = 512,
     threshold: float = 0.20,
@@ -539,7 +535,6 @@ def from_path(
     preemptive_behaviour: bool = True,
     explain: bool = False,
     language_threshold: float = 0.1,
-    enable_fallback: bool = True,
 ) -> CharsetMatches:
     """
     Same thing than the function from_bytes but with one extra step. Opening and reading given file path in binary mode.
@@ -556,71 +551,4 @@ def from_path(
             preemptive_behaviour,
             explain,
             language_threshold,
-            enable_fallback,
         )
-
-
-def is_binary(
-    fp_or_path_or_payload: Union[PathLike, str, BinaryIO, bytes],  # type: ignore[type-arg]
-    steps: int = 5,
-    chunk_size: int = 512,
-    threshold: float = 0.20,
-    cp_isolation: Optional[List[str]] = None,
-    cp_exclusion: Optional[List[str]] = None,
-    preemptive_behaviour: bool = True,
-    explain: bool = False,
-    language_threshold: float = 0.1,
-    enable_fallback: bool = False,
-) -> bool:
-    """
-    Detect if the given input (file, bytes, or path) points to a binary file. aka. not a string.
-    Based on the same main heuristic algorithms and default kwargs at the sole exception that fallbacks match
-    are disabled to be stricter around ASCII-compatible but unlikely to be a string.
-    """
-    if isinstance(fp_or_path_or_payload, (str, PathLike)):
-        guesses = from_path(
-            fp_or_path_or_payload,
-            steps=steps,
-            chunk_size=chunk_size,
-            threshold=threshold,
-            cp_isolation=cp_isolation,
-            cp_exclusion=cp_exclusion,
-            preemptive_behaviour=preemptive_behaviour,
-            explain=explain,
-            language_threshold=language_threshold,
-            enable_fallback=enable_fallback,
-        )
-    elif isinstance(
-        fp_or_path_or_payload,
-        (
-            bytes,
-            bytearray,
-        ),
-    ):
-        guesses = from_bytes(
-            fp_or_path_or_payload,
-            steps=steps,
-            chunk_size=chunk_size,
-            threshold=threshold,
-            cp_isolation=cp_isolation,
-            cp_exclusion=cp_exclusion,
-            preemptive_behaviour=preemptive_behaviour,
-            explain=explain,
-            language_threshold=language_threshold,
-            enable_fallback=enable_fallback,
-        )
-    else:
-        guesses = from_fp(
-            fp_or_path_or_payload,
-            steps=steps,
-            chunk_size=chunk_size,
-            threshold=threshold,
-            cp_isolation=cp_isolation,
-            cp_exclusion=cp_exclusion,
-            preemptive_behaviour=preemptive_behaviour,
-            explain=explain,
-            language_threshold=language_threshold,
-            enable_fallback=enable_fallback,
-        )
-
-    return not guesses
