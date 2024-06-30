@@ -25,7 +25,7 @@ def get_service_account_file_path(file_name):
         return None
 
 # Ruta al archivo de credenciales de la cuenta de servicio
-SERVICE_ACCOUNT_FILE = get_service_account_file_path(r"C:\Users\Jei\Downloads\PortalIUB-main\credentials.json")
+SERVICE_ACCOUNT_FILE = get_service_account_file_path(r"C:\Users\Jei\Documents\GitHub\PortalIUB-main\credentials.json")
 
 if SERVICE_ACCOUNT_FILE:
     # Identificador del proyecto de Dialogflow
