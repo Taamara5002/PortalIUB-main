@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Ayuda IUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="shortcut icon" href="/static/imagenes/favicon.ico"/>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item text-center">
+                            <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Logo de la Universidad">
+                        </li>
+                        <li class="nav-item">
+                            <button onclick="window.location.href='/post-login';" class="btn btn-light">
+                                <img src="{{ url_for('static', filename='imagenes/bot.png') }}" alt="Imagen de Contactar"> Preguntar a IA
+                            </button>
+                    </ul>
+                      <ul class="nav flex-column mt-auto">
+                        <li class="nav-item">
+                            <button onclick="window.location.href='/';" class="btn btn-light">
+                                <img src="{{ url_for('static', filename='imagenes/cerrar-sesion.png') }}" alt="Imagen de Cerrar Sesión"> Cerrar Sesión
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <div class="chatbox">
+                    <div id="messages"></div>
+                    <div id="placeholder">
+                        <img src="{{ url_for('static', filename='imagenes/file.png') }}" alt="Imagen de bienvenida" id="welcome-image">
+                        <p id="welcome-text">¡Bienvenido/a al Asistente Virtual de la IUB!</p>
+                        <p>Estoy aquí para ayudarte con preguntas sobre admisiones, programas académicos, matrícula, becas y más. Escribe tu pregunta y obtén la información que necesitas.</p>
+                    </div>
+                    <form id="chat-form">
+                        <input type="text" id="messageInput" placeholder="Escribe aquí..." required>
+                        <button type="submit">
+                            <img src="{{ url_for('static', filename='imagenes/enviar.png') }}" alt="Enviar">
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
