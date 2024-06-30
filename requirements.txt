@@ -19,3 +19,4 @@ rsa==4.9
 urllib3==2.2.2
 Werkzeug==3.0.3
 python-dotenv==0.21.1
+bcrypt==4.1.3

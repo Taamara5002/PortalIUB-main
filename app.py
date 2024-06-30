@@ -6,8 +6,13 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 from dotenv import load_dotenv
 import os
+import bcrypt
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Secreto para la sesión
 
 # Función para cargar la ruta del archivo de credenciales
 def get_service_account_file_path(file_name):
@@ -99,6 +104,12 @@ def get_database_connection():
         print(f"Error connecting to database: {str(e)}")
         return None
 
+# Función para encriptar la contraseña
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed
+
 # Función para validar las credenciales de inicio de sesión
 def validate_login(correo, password):
     conn = get_database_connection()
@@ -107,7 +118,7 @@ def validate_login(correo, password):
         cursor.execute("SELECT id, password FROM users WHERE correo = %s", (correo,))
         user = cursor.fetchone()
         conn.close()
-        if user and user[1] == password:
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[1].encode('utf-8')):
             return {'id': user[0]}
     return None
 
@@ -121,32 +132,6 @@ def email_exists(correo):
         conn.close()
         return user is not None
     return False
-
-# Función para modificar la longitud de la columna 'password'
-def modify_password_column():
-    try:
-        conn = get_database_connection()
-        if conn:
-            cursor = conn.cursor()
-            cursor.execute("ALTER TABLE users MODIFY COLUMN password VARCHAR(255)")
-            conn.commit()
-            conn.close()
-            print("La columna 'password' ha sido modificada correctamente.")
-            return True
-        else:
-            print("Error: No se pudo conectar a la base de datos.")
-            return False
-    except Exception as e:
-        print("Error al modificar la columna 'password':", e)
-        return False
-
-# Ruta para modificar la columna 'password'
-@app.route('/modify_password_column')
-def modify_column_route():
-    if modify_password_column():
-        return "Modificación de la columna 'password' realizada con éxito."
-    else:
-        return "Error al modificar la columna 'password'."
 
 # Ruta principal del chat
 @app.route('/')
@@ -228,8 +213,11 @@ def register():
             flash('La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y un carácter especial.', 'error')
             return redirect(url_for('register'))
 
+        # Encriptar la contraseña
+        hashed_password = hash_password(password)
+
         # Llamar a la función para insertar usuario en la base de datos
-        if InsertInTable_U((correo, password, first_name, program)):
+        if InsertInTable_U((correo, hashed_password.decode('utf-8'), first_name, program)):
             flash('Usuario registrado exitosamente', 'success')
             return redirect(url_for('index'))
         else:
