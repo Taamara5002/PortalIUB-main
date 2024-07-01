@@ -122,17 +122,6 @@ body {
     align-self: flex-end;
 }
 
-.message-bot {
-    background-color: white;
-    color: black;
-    padding: 10px;
-    border-radius: 15px;
-    margin: 10px;
-    text-align: left;
-    position: relative;
-    align-self: flex-start;
-}
-
 form {
     display: flex;
     align-items: center;
